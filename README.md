@@ -12,7 +12,7 @@ The project investigates the concept of **"momentum"** in basketball by analyzin
 * **Key Objective:** Quantify possession duration, identify critical turning points (specifically the second quarter), and apply the `localScore` statistical package to detect momentum shifts.
 
 ## Tech Stack & Libraries
-* **Language:** R[cite: 1]
+* **Language:** R
 * **Data Manipulation & Analysis:** `dplyr`, `readxl`, `localScore`
 * **Data Visualization:** `ggplot2`, `cowplot`
 
