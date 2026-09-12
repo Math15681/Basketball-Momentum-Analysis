@@ -1,0 +1,299 @@
+---
+title: "JO2024"
+author: "Mathilde Buffard"
+date: "2025-01-24"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+Rapport Stage Janvier 2025 à l'Institut de Mathématiques de Toulouse :
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Importation
+
+```{r}
+library(readxl)
+library(ggplot2)
+library(dplyr)
+library(localScore)
+JO2024Finale <- read_excel("JO2024Finale.xlsx")
+BasketJO_1_ <- read_excel("BasketJO (1).xlsx")
+Book_2 <- read_excel("Book 2.xlsx")
+
+```
+
+## Including Plots
+
+Durant ce stage, j'avais pour mission d'analyser le moment momentum durant un match, avec pour objectifs de découvrir le language de programmation Rstudio. J'ai ainsi choisi la finale des Jeux Olympiques 2024 en Basket Masculin qui opposait la France au USA.
+
+J'ai donc réalisé une analyse complète de la durée de la possession de chaque équipe afin d'observer les moments décisifs de ce match.
+
+Tout d'abord, voici un graphique qui compare le type d'issue à chaque fin de possession des deux équipes.
+
+```{r fig.width=10, fig.height=5}
+#Graphique Issue
+BarIssue <- ggplot(data = BasketJO_1_) +
+  geom_bar(aes(x=Issue), position = "dodge") +
+  labs(title="Comparaison des Issues France/USA")
+
+BarIssue + aes(fill=Pays) + theme(plot.title=element_text(size=15))
+
+```
+
+Nous remarquons que la France a raté la moitié de ses lancers francs, au total 7 lancers francs ratés.
+
+Nous constatons aussi la différence de tir 3 points marqués par les USA et par la France. Nous avons 8 tirs de 3 points et 17 pour les USA. Au total, 54 points marqués par les USA et 24 points marqués par la France, nous avons une différence de 30 points.
+
+```{r fig.width=25, fig.height=13}
+#Graphique Evolution du Score
+BasketJO_1_$Possessions <- as.numeric(substring(BasketJO_1_$Possesions, first=2))
+GraphiqueEvol <- ggplot(BasketJO_1_, aes(x=Possessions, y=Evolution_Score, col=Pays)) + labs(
+  title = "Évolution du score des équipes",
+  x = "Durée",
+  y="Score"
+) + 
+  geom_line(linewidth=1.5) +
+  geom_vline(xintercept=31, linewitdh=18) + 
+  geom_vline(xintercept = 66, linewitdh=18) +
+  geom_vline(xintercept = 100, linewitdh=18) +
+  annotate("text", x=15, y=25, label="QT1", cex=10) +
+  annotate("text", x=60, y=25, label="QT2", cex=10) +
+  annotate("text", x=90, y=25, label="QT3", cex=10) +
+  annotate("text", x=120, y=25, label="QT4", cex=10)+
+  theme(plot.title=element_text(size=45), legend.title = element_text(size = 35), legend.text= element_text(size = 33))
+
+```
+
+Nous continuons avec 10 graphiques qui nous permettent de comparer la moyenne de possession par QT et par équipe.
+
+```{r fig.width=12, fig.height=12}
+
+#QT1
+#MoyennePQT1
+MoyennePQT1France <- mean(JO2024Finale$`Durée (s)`[1:30])
+MoyennePQT1USA <- mean(JO2024Finale$`Durée (s)`[66:96])
+
+#Même Feuille
+split.screen(2:1)
+screen(2)
+hist(JO2024Finale$`Durée (s)`[1:30], 
+     main="Durée des Attaques Françaises durant le QT1", 
+     xlab="Durée de Possessions", ylab="Nombre d'Actions", 
+     xlim=c(0, 25), ylim=c(0,15))
+abline(v=MoyennePQT1France, col="blue")
+text(18, 13, "Moyenne de Possession France", cex=1.5, col="black")
+screen(1)
+hist(JO2024Finale$`Durée (s)`[66:96], 
+     main="Durée des Attaques Américaines durant le QT1", 
+     xlab="Durée de Possessions", ylab="Nombre d'Actions", 
+     xlim=c(0, 25), ylim=c(0, 15)
+     )
+abline(v=MoyennePQT1USA, col="blue")
+text(15, 13, "Moyenne de Possession Américaine", cex=1.5, col="black")
+
+```
+
+```{r fig.width=12, fig.height=12}
+
+#QT2
+#MoyennePQT2
+MoyennePQT2France <- mean(JO2024Finale$`Durée (s)`[31:65])
+MoyennePQT2USA <- mean(JO2024Finale$`Durée (s)`[97:126])
+
+#Même Feuille
+split.screen(2:1)
+screen(1);hist(JO2024Finale$`Durée (s)`[97:126], 
+               main="Durée des Attaques Américaines durant le QT2", 
+               xlab="Durée de Possessions", ylab="Nombre d'Actions", 
+               xlim=c(0, 25), ylim=c(0, 20))
+abline(v=MoyennePQT2USA, col="blue")
+text(13, 15, "Moyenne de Possession Américaine", cex=1.5, col="black")
+screen(2);hist(JO2024Finale$`Durée (s)`[31:65], 
+     main="Durée des Attaques Françaises durant le QT2", 
+     xlab="Durée de Possessions", ylab="Nombre d'Actions", 
+     xlim=c(0, 25), ylim=c(0, 20))
+abline(v=MoyennePQT2France, col="blue")
+text(13, 15, "Moyenne de Possession France", cex=1.5, col="black")
+```
+
+```{r fig.width=12, fig.height=12}
+
+#QT3
+#Moyenne QT3
+MoyennePQT3France <- mean(JO2024Finale$`Durée (s)`[127:158])
+MoyennePQT3USA <- mean(JO2024Finale$`Durée (s)`[159:194])
+
+#Même Feuille
+split.screen(2:1)
+screen(2)
+hist(JO2024Finale$`Durée (s)`[127:158], 
+     main="Durée des Attaques Françaises durant le QT3", 
+     xlab="Durée de Possessions", ylab="Nombre d'Actions", 
+     xlim=c(0, 25), ylim=c(0, 20))
+abline(v=MoyennePQT3France, col="blue")
+text(15, 15, "Moyenne de Possession France", cex=1.5, col="black")
+screen(1)
+hist(JO2024Finale$`Durée (s)`[159:227], 
+               main="Durée des Attaques Américaines durant le QT3", 
+               xlab="Durée de Possessions", ylab="Nombre d'Actions", 
+               xlim=c(0, 25), ylim=c(0, 40))
+abline(v=MoyennePQT3USA, col="blue")
+text(15, 27, "Moyenne de Possession Américaine", cex=1.5, col="black")
+
+```
+
+```{r fig.width=12, fig.height=12}
+
+#QT4
+#Moyenne QT4
+MoyennePQT4France <- mean(JO2024Finale$`Durée (s)`[195:227])
+MoyennePQT4USA <- mean(JO2024Finale$`Durée (s)`[228:256])
+
+#Même Feuille
+split.screen(2:1)
+screen(2)
+hist(JO2024Finale$`Durée (s)`[195:227], 
+     main="Durée des Attaques Françaises durant le QT4", 
+     xlab="Durée de Possession", ylab="Nombre d'Actions", 
+     xlim=c(0, 25), ylim=c(0, 20))
+abline(v=MoyennePQT4France, col="blue")
+text(13, 15, "Moyenne de Possession France", cex=1.5, col="black")
+screen(1)
+hist(JO2024Finale$`Durée (s)`[228:256], 
+     main="Durée des Attaques Américaines durant le QT4", 
+     xlab="Durée de Possession", ylab="Nombre d'Actions", 
+     xlim=c(0, 25), ylim=c(0, 40))
+abline(v=MoyennePQT4USA, col="blue")
+text(16, 27, "Moyenne de Possession Américaine", cex=1.5, col="black")
+
+```
+
+```{r fig.width=12, fig.height=12}
+#QTMoyenneduMatch
+
+MoyenneFrance <-mean(BasketJO_1_$Duree[1:128])
+MoyenneUSA <- mean(BasketJO_1_$Duree[129:251])
+
+
+split.screen(2:1)
+screen(2)
+hist(BasketJO_1_$Duree[1:128],
+     main="Durée des Attaques Françaises", 
+     xlab="Durée de Possession", ylab="Nombre d'Actions", 
+     xlim=c(0, 25), ylim=c(0, 60))
+abline(v=MoyenneFrance, col="blue")
+text(15, 50, "Moyenne de Possession France", cex=1.5, col="black")
+screen(1)
+hist(BasketJO_1_$Duree[129:251], 
+     main="Durée des Attaques Américaines", 
+     xlab="Durée de Possession", ylab="Nombre d'Actions", 
+     xlim=c(0, 25), ylim=c(0, 60))
+abline(v=MoyenneUSA, col="blue")
+text(15, 50, "Moyenne de Possession Américaine", cex=1.5, col="black")
+
+
+```
+
+Ainsi, nous concluons que la moyenne de possession américaine est plus faible que celle de la France. Les attaques américains sont principalement axés sur deux points:
+
+-   de faible durée
+
+-   répétition dans ces attaques
+
+Ensuite, j'ai réalisé un graphique qui étudie la densité de possession de chaque équipe. Nous avons un tableau qui nous aide à comparer ces densités par QT et par équipe. Le suivant nous apporte une aide supplémentaire, avec une densité moyenne de chaque équipe.
+
+```{r fig.width=12, fig.height=10}
+
+#Graphique Possession (QT1, QT2, QT3, QT4, Moyenne du match) en Grille
+ggplot(data = BasketJO_1_, aes(x= `Duree`, fill=Pays)) + labs(
+  title = "Densité Moyenne de Possession en fonction de la Durée", 
+  x = "Durée", 
+  y = "Densité"
+) + 
+  geom_density(alpha=0.5)+
+  facet_grid(QT~Pays)+
+  theme(plot.title=element_text(size=20), legend.title = element_text(size=15), legend.text = element_text(size=13))
+  
+
+ggplot(data = BasketJO_1_, aes(x= `Duree`, fill=Pays)) + 
+  labs(
+    title = "Densité de Moyenne de Possession en fonction de la Durée", 
+    x = "Durée", 
+    y = "Densité") +
+  geom_density(alpha=0.4) + 
+  facet_grid() +
+  theme(plot.title=element_text(size=20), legend.title = element_text(size=15), legend.text = element_text(size=13))
+```
+
+Nous faisons donc le même constat, la possession américaine est plus courte et répétitive comparée à la France.
+
+Nous remarquons grâce aux précédents graphiques, que le QT2 est un moment décisif pour le match. C'est à partir de ce QT que la France sera menée et ne reviendra plus au score.
+
+Voici deux graphiques qui ont zoomés sur le QT2. Le premier graphique nous montre l'évolution du score du QT, et le deuxième graphique a pour but de représenter la durée de possesion des deux équipes.
+
+```{r fig.width=12, fig.height=10}
+
+#Graphique Evolution Score QT2, sélectionnez un caractère
+library(cowplot)
+
+BasketJO_1_$Possessions <- as.numeric(substring(BasketJO_1_$Possesions, first=2))
+fig1 <- ggplot(BasketJO_1_[BasketJO_1_$QT == "Q2",], aes(x= Possessions, y=Evolution_Score, col=Pays)) + 
+  labs(
+  title = "Évolution du score des équipes durant le QT2",
+  x = "Durée",
+  y="Score",
+) + 
+  geom_line(linewidth=1) +
+  theme(plot.title=element_text(size=20), legend.title = element_text(size=15), legend.text = element_text(size=13))
+
+
+fig2 <- ggplot(data = BasketJO_1_[BasketJO_1_$QT == "Q2",], aes(x= `Duree`, fill=Pays)) + 
+  labs(
+  title = "Densité de Moyenne de Possession en fonction de la Durée durant le QT2", 
+  x = "Durée", 
+  y = "Densité") +
+  geom_density(alpha=0.4) + 
+  facet_grid() + 
+  theme(plot.title=element_text(size=20), legend.title = element_text(size=15), legend.text = element_text(size=13))
+plot_grid(fig1, fig2, labels=c("A", "B"), ncol=1, nrow = 2)
+```
+
+Grâce à des graphiques, nous constatons que les actions des USA sont principalement courtes et efficaces puisqu'ils sont devant au score. Contrairement à la France qui met plus de temps à attaquer.
+
+En conclusion, la France a énormément raté d'occasions face au panier, 7 points ratés au lancer franc. Nous avions aussi 30 points de différence entre la France et l'USA par rapport au tir à 3 points. Le jeu d'attaques des USA est basé sur des attaques courtes, rapides et efficaces.
+
+
+Deuxièment, les résultats trouvés avec la fonction localScore pour essayer de déterminer le moment "Momentum".  
+
+https://theanalyst.com/eu/2021/11/what-is-match-momentum, un article qui explique la signification de ce nouveau terme.
+
+Les deux premiers graphiques correspondent à ceux de la France et les deux derniers à l'USA.
+```{r, fig.width=12, fig.height=10}
+#localScore
+filtered_data <- Book_2%>%filter(Issue %in% c("3pts", "2pts", "TR", "LF")) %>%
+  mutate(Evolution_Score = case_when( Issue == "3pts" & Pays== "USA" ~ -3, 
+                                      Issue == "3pts" & Pays== "Fr" ~ 3,
+                                      Issue == "2pts" & Pays == "USA" ~ -2,
+                                      Issue == "2pts" & Pays == "Fr" ~
+2, 
+                                      Issue == "LF" & Pays == "USA" ~ -1,
+                                      Issue == "LF" & Pays == "Fr"~ 1,
+                                      Issue == "TR" ~ 0))
+
+#localScoreFrançais
+print(filtered_data)
+localScoreC(filtered_data$Evolution_Score)
+plot(filtered_data$Evolution_Score, type="b")
+plot(lindley(filtered_data$Evolution_Score), type="b")
+
+#localScoreUSA
+localScoreC(-filtered_data$Evolution_Score)
+plot(-filtered_data$Evolution_Score, type="b")
+plot(lindley(-filtered_data$Evolution_Score), type="b")
+
+```
