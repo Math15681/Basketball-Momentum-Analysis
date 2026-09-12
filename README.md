@@ -24,6 +24,8 @@ The project investigates the concept of **"momentum"** in basketball by analyzin
 ## Repository Structure
 ```text
 ├── data/                  # Raw and processed datasets (anonymized/subset)
-├── src/                   # R scripts and RMarkdown reports (`AnalyseJO2024.Rmd`)
 ├── outputs/               # Generated plots and exported figures
+├── src/                   # R scripts and RMarkdown reports (`AnalyseJO2024.Rmd`)
 └── README.md
+
+
